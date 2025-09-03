@@ -12,6 +12,9 @@
   VITE_FIREBASE_APP_ID = "1:683556317411:web:c03007d53a027791f03dd6"
   VITE_FIREBASE_MEASUREMENT_ID = "G-5R8CRKLXN5"
 
+# Explicitly disable all plugins
+[[plugins]]
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
