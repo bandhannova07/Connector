@@ -1,6 +1,61 @@
 # ConnectorbyNova
 
-A secure, end-to-end encrypted chat application built with React, TypeScript, and Firebase.
+A secure end-to-end encrypted chat application built with React, TypeScript, and Firebase.
+
+## 🚀 Live Demo
+- **Production**: [https://connectorbynova.netlify.app](https://connectorbynova.netlify.app)
+- **GitHub**: [https://github.com/bandhannova07/Connector](https://github.com/bandhannova07/Connector)
+
+## ✨ Features
+- 🔐 End-to-end encryption using NaCl (tweetnacl)
+- 🔥 Real-time messaging with Firebase
+- 👥 1:1 and group chats
+- 📱 PWA support with offline capabilities
+- 🎨 Dark/Light theme support
+- 📁 File sharing and media upload
+- 🔔 Push notifications
+- 🔒 Password-based app lock
+- 🔍 User search and contact requests
+
+## 🛠️ Tech Stack
+- **Frontend**: React 18, TypeScript, Vite
+- **Backend**: Firebase (Auth, Firestore, Storage)
+- **Encryption**: tweetnacl (NaCl)
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **PWA**: Vite PWA Plugin
+
+## 🏗️ Deployment
+
+### Netlify Deployment
+1. Connect your GitHub repository to Netlify
+2. Build settings are configured in `netlify.toml`
+3. Environment variables are set in the config file
+4. Deploy automatically on push to main branch
+
+### Build Commands
+```bash
+npm install
+npm run build
+```
+
+## 🔧 Development
+```bash
+npm install
+npm run dev
+```
+
+## 📱 PWA Features
+- Offline support
+- Install prompt
+- Service worker caching
+- Push notifications (when implemented)
+
+## 🔐 Security
+- Client-side encryption only
+- Zero-knowledge architecture
+- Secure key management
+- Firebase security rules implemented
 
 ## Features
 
