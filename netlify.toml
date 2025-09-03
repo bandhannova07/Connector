@@ -4,13 +4,6 @@
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[context.production.environment]
   VITE_FIREBASE_API_KEY = "AIzaSyDhZuInExe2qVK4Px3hsQ8VNRARcxvFm2Y"
   VITE_FIREBASE_AUTH_DOMAIN = "connetor-by-nova.firebaseapp.com"
   VITE_FIREBASE_PROJECT_ID = "connetor-by-nova"
@@ -18,6 +11,11 @@
   VITE_FIREBASE_MESSAGING_SENDER_ID = "683556317411"
   VITE_FIREBASE_APP_ID = "1:683556317411:web:c03007d53a027791f03dd6"
   VITE_FIREBASE_MEASUREMENT_ID = "G-5R8CRKLXN5"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"
