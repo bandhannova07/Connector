@@ -37,6 +37,7 @@ function App() {
         try {
           const userData = await authService.getUserData(firebaseUser.uid);
           if (userData) {
+            // Set user first
             setUser(userData);
             
             // Generate new keys if none exist
@@ -47,8 +48,6 @@ function App() {
               cryptoService.setKeyPair(keyPair);
               setKeyPair(keyPair);
             }
-            
-            // Always allow direct access
           } else {
             console.error('No user data found for:', firebaseUser.uid);
           }
