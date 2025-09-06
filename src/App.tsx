@@ -32,7 +32,7 @@ function App() {
   const cryptoService = CryptoService.getInstance();
 
   // Guest Mode - Skip Authentication
-  const GUEST_MODE = true; // Set to false to enable authentication
+  const GUEST_MODE = false; // Set to true to enable guest mode
 
   useEffect(() => {
     if (GUEST_MODE) {

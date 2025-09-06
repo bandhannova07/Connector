@@ -25,7 +25,16 @@ const SettingsPage: React.FC = () => {
     setIsUpdating(true);
     try {
       const updatedSettings = { ...user.settings, theme };
-      await authService.updateUserData(user.uid, { settings: updatedSettings });
+      
+      // Check if this is guest mode (guest users have uid starting with 'guest-')
+      const isGuestMode = user.uid.startsWith('guest-');
+      
+      if (!isGuestMode) {
+        // Only update Firebase for real users
+        await authService.updateUserData(user.uid, { settings: updatedSettings });
+      }
+      
+      // Always update local state
       setUser({ ...user, settings: updatedSettings });
       
       // Apply theme immediately
@@ -56,7 +65,16 @@ const SettingsPage: React.FC = () => {
         ...user.settings, 
         notifications: !user.settings.notifications 
       };
-      await authService.updateUserData(user.uid, { settings: updatedSettings });
+      
+      // Check if this is guest mode (guest users have uid starting with 'guest-')
+      const isGuestMode = user.uid.startsWith('guest-');
+      
+      if (!isGuestMode) {
+        // Only update Firebase for real users
+        await authService.updateUserData(user.uid, { settings: updatedSettings });
+      }
+      
+      // Always update local state
       setUser({ ...user, settings: updatedSettings });
       toast.success('Notification settings updated');
     } catch (error) {
