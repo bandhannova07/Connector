@@ -60,12 +60,16 @@ export class AuthService {
       createdAt: new Date()
     };
 
-    // Save user data to Firestore
-    await setDoc(doc(db, 'users', firebaseUser.uid), {
-      ...userData,
-      lastSeen: serverTimestamp(),
-      createdAt: serverTimestamp()
-    });
+    // Save user data to Firestore - filter out undefined values
+    const firestoreData = Object.fromEntries(
+      Object.entries({
+        ...userData,
+        lastSeen: serverTimestamp(),
+        createdAt: serverTimestamp()
+      }).filter(([_, value]) => value !== undefined)
+    );
+
+    await setDoc(doc(db, 'users', firebaseUser.uid), firestoreData);
 
     console.log('User document created successfully for:', firebaseUser.uid);
 
