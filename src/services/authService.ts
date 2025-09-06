@@ -67,6 +67,8 @@ export class AuthService {
       createdAt: serverTimestamp()
     });
 
+    console.log('User document created successfully for:', firebaseUser.uid);
+
     // Reserve username
     await setDoc(doc(db, 'handles', username), {
       uid: firebaseUser.uid,
@@ -106,18 +108,25 @@ export class AuthService {
   }
 
   async getUserData(uid: string): Promise<User | null> {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    if (!userDoc.exists()) {
-      return null;
-    }
+    try {
+      const userDoc = await getDoc(doc(db, 'users', uid));
+      if (!userDoc.exists()) {
+        console.log('User document does not exist for:', uid);
+        return null;
+      }
 
-    const data = userDoc.data();
-    return {
-      uid,
-      ...data,
-      lastSeen: data.lastSeen?.toDate() || new Date(),
-      createdAt: data.createdAt?.toDate() || new Date()
-    } as User;
+      const data = userDoc.data();
+      console.log('User data retrieved for:', uid, data.username);
+      return {
+        uid,
+        ...data,
+        lastSeen: data.lastSeen?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate() || new Date()
+      } as User;
+    } catch (error) {
+      console.error('Error fetching user data for:', uid, error);
+      throw error;
+    }
   }
 
   async updateUserData(uid: string, updates: Partial<User>): Promise<void> {

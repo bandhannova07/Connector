@@ -4,14 +4,19 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDhZuInExe2qVK4Px3hsQ8VNRARcxvFm2Y",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "connetor-by-nova.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "connetor-by-nova",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "connetor-by-nova.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "683556317411",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:683556317411:web:c03007d53a027791f03dd6",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-5R8CRKLXN5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
+
+// Validate required environment variables
+if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+  throw new Error('Missing required Firebase environment variables. Please check your .env file.');
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

@@ -31,30 +31,35 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setFirebaseUser(firebaseUser);
+      console.log('Auth state changed:', firebaseUser?.uid);
       
       if (firebaseUser) {
         try {
+          // Set Firebase user immediately
+          setFirebaseUser(firebaseUser);
+          
           const userData = await authService.getUserData(firebaseUser.uid);
           if (userData) {
-            // Set user first
+            console.log('User data loaded:', userData.username);
             setUser(userData);
             
             // Generate new keys if none exist
             const storedKeys = localStorage.getItem('encryptedKeys');
             if (!storedKeys) {
-              // Generate new encryption keys for this session
               const keyPair = cryptoService.generateKeyPair();
               cryptoService.setKeyPair(keyPair);
               setKeyPair(keyPair);
             }
           } else {
-            console.error('No user data found for:', firebaseUser.uid);
+            console.warn('No user data found for:', firebaseUser.uid, 'This might be a new user registration');
+            // Don't set user to null here - let the registration process handle it
           }
         } catch (error) {
           console.error('Error loading user data:', error);
         }
       } else {
+        console.log('User signed out');
+        setFirebaseUser(null);
         setUser(null);
         setKeyPair(null);
         cryptoService.setKeyPair(null);
