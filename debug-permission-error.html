@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Permission Error</title>
+</head>
+<body>
+    <h1>Debug Permission Error</h1>
+    <div id="status"></div>
+    <button onclick="testSignUp()">Test Sign Up</button>
+    <button onclick="testAnonymous()">Test Anonymous Auth</button>
+    <button onclick="testAuth()">Test Auth State</button>
+    <div id="logs"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            signInAnonymously,
+            onAuthStateChanged 
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc,
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhZuInExe2qVK4Px3hsQ8VNRARcxvFm2Y",
+            authDomain: "connetor-by-nova.firebaseapp.com",
+            projectId: "connetor-by-nova",
+            storageBucket: "connetor-by-nova.firebasestorage.app",
+            messagingSenderId: "683556317411",
+            appId: "1:683556317411:web:c03007d53a027791f03dd6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function log(message) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
+            console.log(message);
+        }
+
+        window.testAnonymous = async function() {
+            try {
+                log('🧪 Testing anonymous authentication...');
+                await signInAnonymously(auth);
+                log('✅ Signed in as anonymous user');
+                
+                // Test Firestore permissions with anonymous user
+                const user = auth.currentUser;
+                if (user) {
+                    log(`✅ Anonymous user ID: ${user.uid}`);
+                    
+                    // Test write to users collection
+                    log('🧪 Testing users collection write with anonymous user...');
+                    await setDoc(doc(db, 'users', user.uid), {
+                        anonymous: true,
+                        createdAt: serverTimestamp(),
+                        test: true
+                    });
+                    log('✅ Anonymous users collection write: SUCCESS');
+                    
+                    // Test write to test collection
+                    log('🧪 Testing test collection write with anonymous user...');
+                    await setDoc(doc(db, 'test', `anon-${Date.now()}`), {
+                        message: 'Anonymous test successful',
+                        timestamp: serverTimestamp()
+                    });
+                    log('✅ Anonymous test collection write: SUCCESS');
+                    
+                    log('🎉 Anonymous authentication and permissions working!');
+                }
+            } catch (error) {
+                log(`❌ Anonymous auth error: ${error.code}`);
+                log(`❌ Message: ${error.message}`);
+            }
+        };
+
+        window.testAuth = function() {
+            log('Testing auth state...');
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    log(`✅ User authenticated: ${user.uid}`);
+                    log(`Email: ${user.email || 'Anonymous'}`);
+                    log(`Anonymous: ${user.isAnonymous}`);
+                } else {
+                    log('❌ User not authenticated');
+                }
+            });
+        };
+
+        window.testSignUp = async function() {
+            const testEmail = `test${Date.now()}@example.com`;
+            const testPassword = 'TestPassword123!';
+            
+            try {
+                log(`🧪 Creating user: ${testEmail}`);
+                
+                // Step 1: Create Firebase user
+                const userCredential = await createUserWithEmailAndPassword(auth, testEmail, testPassword);
+                const user = userCredential.user;
+                log(`✅ Firebase user created: ${user.uid}`);
+                
+                // Step 2: Try to write to users collection
+                log('🧪 Writing to users collection...');
+                await setDoc(doc(db, 'users', user.uid), {
+                    email: user.email,
+                    createdAt: serverTimestamp(),
+                    test: true
+                });
+                log('✅ Users collection write: SUCCESS');
+                
+                // Step 3: Try to write to handles collection
+                log('🧪 Writing to handles collection...');
+                await setDoc(doc(db, 'handles', `test-${Date.now()}`), {
+                    uid: user.uid,
+                    reserved: true
+                });
+                log('✅ Handles collection write: SUCCESS');
+                
+                log('🎉 All tests passed! No permission errors.');
+                
+            } catch (error) {
+                log(`❌ ERROR: ${error.code}`);
+                log(`❌ Message: ${error.message}`);
+                log(`❌ Full error: ${JSON.stringify(error, null, 2)}`);
+                
+                // Detailed error analysis
+                if (error.code === 'permission-denied') {
+                    log('🔴 PERMISSION DENIED - Check Firestore rules');
+                } else if (error.code === 'auth/email-already-in-use') {
+                    log('🟡 Email already exists - try different email');
+                } else {
+                    log('🔴 Unknown error type');
+                }
+            }
+        };
+
+        // Auto-test on load
+        testAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Test</title>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <button onclick="testFirebase()">Test Firebase</button>
+    <div id="result"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhZuInExe2qVK4Px3hsQ8VNRARcxvFm2Y",
+            authDomain: "connetor-by-nova.firebaseapp.com",
+            projectId: "connetor-by-nova",
+            storageBucket: "connetor-by-nova.firebasestorage.app",
+            messagingSenderId: "683556317411",
+            appId: "1:683556317411:web:c03007d53a027791f03dd6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.testFirebase = async function() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Firebase App:', app);
+                console.log('Auth:', auth);
+                console.log('Firestore:', db);
+                console.log('Project ID:', app.options.projectId);
+                
+                // Test authentication
+                const testEmail = 'test' + Date.now() + '@test.com';
+                const testPassword = 'test123456';
+                
+                const userCredential = await createUserWithEmailAndPassword(auth, testEmail, testPassword);
+                console.log('User created:', userCredential.user);
+                
+                // Test firestore write
+                await setDoc(doc(db, 'test', 'test-doc'), {
+                    message: 'Test successful',
+                    timestamp: new Date()
+                });
+                
+                result.innerHTML = '✅ Firebase working perfectly!';
+                
+            } catch (error) {
+                console.error('Firebase Error:', error);
+                result.innerHTML = `❌ Error: ${error.code} - ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
