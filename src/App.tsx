@@ -25,7 +25,8 @@ function App() {
     setFirebaseUser, 
     setUser, 
     setLoading,
-    setKeyPair 
+    setKeyPair,
+    setLocked
   } = useAuthStore();
 
   const authService = new AuthService();
@@ -45,9 +46,10 @@ function App() {
             const storedKeys = localStorage.getItem('encryptedKeys');
             if (storedKeys) {
               // Keys are encrypted, will need unlock
-              setLoading(false);
-              return;
+              setLocked(true);
             }
+          } else {
+            console.error('No user data found for:', firebaseUser.uid);
           }
         } catch (error) {
           console.error('Error loading user data:', error);
@@ -56,6 +58,7 @@ function App() {
         setUser(null);
         setKeyPair(null);
         cryptoService.setKeyPair(null);
+        setLocked(false);
       }
       
       setLoading(false);
