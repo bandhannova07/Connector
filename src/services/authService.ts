@@ -79,6 +79,9 @@ export class AuthService {
       reserved: true
     });
 
+    // Create a default chat for the new user
+    await this.createDefaultChat(firebaseUser.uid, username);
+
     // Store encrypted keys locally
     const encryptedKeys = this.cryptoService.encryptKeyPair(keyPair, password);
     localStorage.setItem('encryptedKeys', encryptedKeys);
@@ -199,6 +202,99 @@ export class AuthService {
     } catch (error) {
       console.error('Failed to unlock with password:', error);
       return false;
+    }
+  }
+
+  async createDefaultChat(userId: string, username: string): Promise<void> {
+    const chatId = `${userId}-welcome`;
+    const chatData = {
+      members: [userId],
+      isGroup: false,
+      name: `Welcome ${username}`,
+      createdBy: userId,
+      admins: [userId],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastMessageText: 'Welcome to Connector! Start chatting securely.',
+      lastMessageAt: serverTimestamp()
+    };
+
+    await setDoc(doc(db, 'chats', chatId), chatData);
+    console.log('Default chat created for user:', userId);
+  }
+
+  async ensureUserHasChat(userId: string): Promise<void> {
+    // Check if user is member of any chat
+    const chatsRef = collection(db, 'chats');
+    const userChatsQuery = query(
+      chatsRef,
+      where('members', 'array-contains', userId)
+    );
+    
+    const chatDocs = await getDocs(userChatsQuery);
+    
+    if (chatDocs.empty) {
+      // User has no chats, create a default one
+      const userData = await this.getUserData(userId);
+      if (userData) {
+        await this.createDefaultChat(userId, userData.username);
+      }
+    }
+  }
+
+  async createOrGetUserData(firebaseUser: any): Promise<User | null> {
+    try {
+      // First try to get existing user data
+      let userData = await this.getUserData(firebaseUser.uid);
+      
+      if (!userData) {
+        console.log('Creating user document for new user:', firebaseUser.uid);
+        
+        // Create user document with basic info
+        const newUserData: Omit<User, 'uid'> = {
+          username: firebaseUser.email?.split('@')[0] || 'user',
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          email: firebaseUser.email || '',
+          photoURL: firebaseUser.photoURL || undefined,
+          about: '',
+          pubBoxKey: '', // Will be set when keys are generated
+          pubSignKey: '', // Will be set when keys are generated
+          devices: {},
+          status: 'online',
+          settings: {
+            notifications: true,
+            theme: 'system',
+            language: 'en'
+          },
+          lastSeen: new Date(),
+          createdAt: new Date()
+        };
+
+        // Save user data to Firestore
+        const firestoreData = Object.fromEntries(
+          Object.entries({
+            ...newUserData,
+            lastSeen: serverTimestamp(),
+            createdAt: serverTimestamp()
+          }).filter(([_, value]) => value !== undefined)
+        );
+
+        await setDoc(doc(db, 'users', firebaseUser.uid), firestoreData);
+        
+        // Create default chat
+        await this.createDefaultChat(firebaseUser.uid, newUserData.username);
+        
+        // Fetch the created user data
+        userData = await this.getUserData(firebaseUser.uid);
+      } else {
+        // Ensure existing user has at least one chat
+        await this.ensureUserHasChat(firebaseUser.uid);
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error('Error creating/getting user data:', error);
+      return null;
     }
   }
 }

@@ -35,9 +35,11 @@ function App() {
       
       if (firebaseUser) {
         try {
-          const userData = await authService.getUserData(firebaseUser.uid);
+          // Use createOrGetUserData to handle both new and existing users
+          const userData = await authService.createOrGetUserData(firebaseUser);
+          
           if (userData) {
-            console.log('User data loaded:', userData.username);
+            console.log('User data loaded/created:', userData.username);
             
             // Set user data first, then Firebase user to trigger isAuthenticated
             setUser(userData);
@@ -49,13 +51,20 @@ function App() {
               const keyPair = cryptoService.generateKeyPair();
               cryptoService.setKeyPair(keyPair);
               setKeyPair(keyPair);
+              
+              // Update user document with public keys
+              const publicKeys = cryptoService.exportPublicKeys(keyPair);
+              await authService.updateUserData(firebaseUser.uid, {
+                pubBoxKey: publicKeys.pubBoxKey,
+                pubSignKey: publicKeys.pubSignKey
+              });
             }
           } else {
-            console.warn('No user data found for:', firebaseUser.uid, 'This might be a new user registration');
+            console.error('Failed to create/get user data for:', firebaseUser.uid);
             setFirebaseUser(firebaseUser);
           }
         } catch (error) {
-          console.error('Error loading user data:', error);
+          console.error('Error in auth state change:', error);
           setFirebaseUser(firebaseUser);
         }
       } else {

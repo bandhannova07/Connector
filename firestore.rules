@@ -20,6 +20,10 @@ service cloud.firestore {
         request.auth.uid in resource.data.members;
       allow create: if request.auth != null && 
         request.auth.uid in request.resource.data.members;
+      // Allow users to create their own welcome chat
+      allow create: if request.auth != null && 
+        chatId == request.auth.uid + '-welcome' &&
+        request.auth.uid in request.resource.data.members;
     }
     
     // Messages - users can only access messages in chats they are members of
