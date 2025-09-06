@@ -20,7 +20,6 @@ export class GuestModeService {
         isGroup: false,
         name: 'Demo Friend',
         avatar: undefined,
-        lastMessage: 'Hey! How are you doing?',
         lastMessageAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
         lastMessageText: 'Hey! How are you doing?',
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
@@ -34,7 +33,6 @@ export class GuestModeService {
         isGroup: true,
         name: 'Demo Group Chat',
         avatar: undefined,
-        lastMessage: 'Welcome to the demo group!',
         lastMessageAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
         lastMessageText: 'Welcome to the demo group!',
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
@@ -51,31 +49,23 @@ export class GuestModeService {
       return [
         {
           id: 'msg-1',
-          chatId: 'demo-chat-1',
           senderId: 'demo-friend-1',
           ciphertext: 'Hey! How are you doing?', // In real app, this would be encrypted
           nonce: 'demo-nonce-1',
           type: 'text',
           createdAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
-          seen: {
-            'guest-user-123': true,
-            'demo-friend-1': true
-          },
+          seen: ['guest-user-123', 'demo-friend-1'],
           reactions: {},
           deletedFor: []
         },
         {
           id: 'msg-2',
-          chatId: 'demo-chat-1',
           senderId: 'guest-user-123',
           ciphertext: 'I\'m doing great! Thanks for asking.',
           nonce: 'demo-nonce-2',
           type: 'text',
           createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-          seen: {
-            'guest-user-123': true,
-            'demo-friend-1': false
-          },
+          seen: ['guest-user-123'],
           reactions: {},
           deletedFor: []
         }
@@ -86,19 +76,14 @@ export class GuestModeService {
       return [
         {
           id: 'msg-3',
-          chatId: 'demo-chat-2',
           senderId: 'guest-user-123',
           ciphertext: 'Welcome to the demo group!',
           nonce: 'demo-nonce-3',
           type: 'text',
           createdAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
-          seen: {
-            'guest-user-123': true,
-            'demo-friend-2': true,
-            'demo-friend-3': false
-          },
+          seen: ['guest-user-123', 'demo-friend-2'],
           reactions: {
-            '👍': ['demo-friend-2']
+            '👍': 'demo-friend-2'
           },
           deletedFor: []
         }
