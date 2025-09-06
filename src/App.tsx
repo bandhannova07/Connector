@@ -9,7 +9,6 @@ import { CryptoService } from './utils/simpleCrypto';
 
 // Components
 import LoadingScreen from './components/LoadingScreen';
-import LockScreen from './components/LockScreen';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
@@ -21,12 +20,10 @@ function App() {
   const { 
     isAuthenticated, 
     isLoading, 
-    isLocked,
     setFirebaseUser, 
     setUser, 
     setLoading,
-    setKeyPair,
-    setLocked
+    setKeyPair
   } = useAuthStore();
 
   const authService = new AuthService();
@@ -42,12 +39,16 @@ function App() {
           if (userData) {
             setUser(userData);
             
-            // Try to load stored keys
+            // Generate new keys if none exist
             const storedKeys = localStorage.getItem('encryptedKeys');
-            if (storedKeys) {
-              // Keys are encrypted, will need unlock
-              setLocked(true);
+            if (!storedKeys) {
+              // Generate new encryption keys for this session
+              const keyPair = cryptoService.generateKeyPair();
+              cryptoService.setKeyPair(keyPair);
+              setKeyPair(keyPair);
             }
+            
+            // Always allow direct access
           } else {
             console.error('No user data found for:', firebaseUser.uid);
           }
@@ -58,7 +59,6 @@ function App() {
         setUser(null);
         setKeyPair(null);
         cryptoService.setKeyPair(null);
-        setLocked(false);
       }
       
       setLoading(false);
@@ -71,9 +71,6 @@ function App() {
     return <LoadingScreen />;
   }
 
-  if (isAuthenticated && isLocked) {
-    return <LockScreen />;
-  }
 
   return (
     <Router>
