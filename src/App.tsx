@@ -35,13 +35,13 @@ function App() {
       
       if (firebaseUser) {
         try {
-          // Set Firebase user immediately
-          setFirebaseUser(firebaseUser);
-          
           const userData = await authService.getUserData(firebaseUser.uid);
           if (userData) {
             console.log('User data loaded:', userData.username);
+            
+            // Set user data first, then Firebase user to trigger isAuthenticated
             setUser(userData);
+            setFirebaseUser(firebaseUser);
             
             // Generate new keys if none exist
             const storedKeys = localStorage.getItem('encryptedKeys');
@@ -52,10 +52,11 @@ function App() {
             }
           } else {
             console.warn('No user data found for:', firebaseUser.uid, 'This might be a new user registration');
-            // Don't set user to null here - let the registration process handle it
+            setFirebaseUser(firebaseUser);
           }
         } catch (error) {
           console.error('Error loading user data:', error);
+          setFirebaseUser(firebaseUser);
         }
       } else {
         console.log('User signed out');

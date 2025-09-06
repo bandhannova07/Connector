@@ -26,8 +26,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLocked: false,
   
   setFirebaseUser: (firebaseUser) => 
-    set(() => ({ 
-      firebaseUser
+    set((state) => ({ 
+      firebaseUser,
+      isAuthenticated: !!firebaseUser && !!state.user
     })),
     
   setUser: (user) => 
