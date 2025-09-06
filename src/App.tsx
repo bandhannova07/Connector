@@ -31,45 +31,7 @@ function App() {
   const authService = new AuthService();
   const cryptoService = CryptoService.getInstance();
 
-  // Guest Mode - Skip Authentication
-  const GUEST_MODE = false; // Set to true to enable guest mode
-
   useEffect(() => {
-    if (GUEST_MODE) {
-      // Create demo user for guest mode
-      const guestUser = {
-        uid: 'guest-user-123',
-        username: 'Guest User',
-        displayName: 'Guest User',
-        email: 'guest@demo.com',
-        photoURL: undefined,
-        about: 'Demo user - no authentication required',
-        pubBoxKey: 'demo-pub-box-key',
-        pubSignKey: 'demo-pub-sign-key',
-        devices: {
-          'demo-device': {
-            deviceName: 'Demo Device',
-            pubKey: 'demo-device-pubkey',
-            lastActive: new Date()
-          }
-        },
-        status: 'online' as const,
-        lastSeen: new Date(),
-        createdAt: new Date(),
-        settings: {
-          theme: 'system' as const,
-          notifications: true,
-          language: 'en'
-        }
-      };
-      
-      // Set guest user as authenticated
-      setUser(guestUser);
-      setFirebaseUser({ uid: 'guest-user-123' } as any);
-      setLoading(false);
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setFirebaseUser(firebaseUser);
       
@@ -106,7 +68,7 @@ function App() {
     return <LoadingScreen />;
   }
 
-  if (isAuthenticated && isLocked && !GUEST_MODE) {
+  if (isAuthenticated && isLocked) {
     return <LockScreen />;
   }
 
