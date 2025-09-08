@@ -1,17 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://qanwohrwrycvdgwbhcgy.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhbndvaHJ3cnljdmRnd2JoY2d5IiwiaWF0IjoxNzU3MjM2OTIwLCJleHAiOjIwNzI4MTI5MjB9.y4p0gvjxRSfe_Puty-a5d-Da7yXM7cbpvsKLuqyYLSg';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Storage bucket name
-export const STORAGE_BUCKET = 'chat-media';
+export const STORAGE_BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'chat-media';
 
 // File size limits (in bytes)
 export const FILE_SIZE_LIMITS = {
   image: 15 * 1024 * 1024, // 15MB
-  video: 70 * 1024 * 1024, // 70MB
+  video: 50 * 1024 * 1024, // 50MB
   voice: 10 * 1024 * 1024, // 10MB
   file: 50 * 1024 * 1024,  // 50MB
 };
